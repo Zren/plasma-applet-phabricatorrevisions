@@ -10,34 +10,31 @@ import "lib/TimeUtils.js" as TimeUtils
 IssueListView {
 	id: issueListView
 
-	isSetup: widget.hasProduct
+	isSetup: widget.configIsSet
 	showHeading: plasmoid.configuration.showHeading
-	headingText: plasmoid.configuration.productList.join(', ')
+	headingText: ''
 
 	delegate: IssueListItem {
-		property bool issueClosed: {
-			return issue.status == 'RESOLVED' || issue.status == 'CLOSED'
-		}
+		property bool issueClosed: issue.fields.status.closed
 		issueOpen: !issueClosed
 		issueId: issue.id
-		issueSummary: issue.summary
+		issueSummary: issue.fields.title
 		tagBefore: plasmoid.configuration.productList.length >= 2 ? issue.product : ""
 		issueCreatorName: issue.creator_detail.real_name || issue.creator_detail.name
-		issueHtmlLink: 'https://' + plasmoid.configuration.domain + '/show_bug.cgi?id=' + issue.id
+		issueHtmlLink: 'https://' + plasmoid.configuration.domain + '/D' + issue.id
 
-		// As of writing, KDE's bugzilla v5.0.4 does respond with comment_count,
-		// while Mozilla's bugzilla does.
-		property bool supportsComments: typeof issue.comment_count !== "undefined"
-		// Note: The "reporter comment" is included in the total,
-		// so we subtract by 1 to get the number of responses.
-		showNumComments: supportsComments && numComments > 0
-		numComments: supportsComments ? (issue.comment_count - 1) : 0
+		showNumComments: false
+		numComments: 0
 
 		dateTime: {
 			if (issueOpen) {
-				return issue.creation_time
+				return issue.fields.dateCreated
 			} else { // Closed
-				return issue.last_change_time
+				// Phab doesn't have a dedicated dataClosed property.
+				// This should suffice I guess, but we probably need
+				// to parse every diff's "events" to get the proper
+				// closed timestamp.
+				return issue.fields.dateModified
 			}
 		}
 

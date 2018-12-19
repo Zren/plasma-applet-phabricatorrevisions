@@ -6,11 +6,14 @@
   <kcfgfile name=""/>
 
   <group name="General">
+    <entry name="apiToken" type="string">
+      <default></default>
+    </entry>
     <entry name="domain" type="string">
-      <default>bugs.kde.org</default>
+      <default>phabricator.kde.org</default>
     </entry>
     <entry name="productList" type="stringlist">
-      <default>plasmashell,kdeplasma-addons,plasma-nm,plasma-pa,Plasma Vault,frameworks-plasma,plasma-browser-integration,plasma-integration,Active Window Control</default>
+      <default></default>
     </entry>
     <entry name="updateIntervalInMinutes" type="int">
       <default>60</default>

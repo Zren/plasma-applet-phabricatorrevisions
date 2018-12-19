@@ -12,31 +12,16 @@ Item {
 
 	Logger {
 		id: logger
-		name: 'bugzilla'
-		// showDebug: true
+		name: 'PhabDiffs'
+		showDebug: true
 	}
 
 	Plasmoid.icon: plasmoid.file("", "icons/bug.svg")
 	Plasmoid.backgroundHints: plasmoid.configuration.showBackground ? PlasmaCore.Types.DefaultBackground : PlasmaCore.Types.NoBackground
 	Plasmoid.hideOnWindowDeactivate: !plasmoid.userConfiguring
 
-	readonly property bool hasProduct: plasmoid.configuration.domain && plasmoid.configuration.productList
+	readonly property bool configIsSet: plasmoid.configuration.apiToken && plasmoid.configuration.domain
 	readonly property string issueState: plasmoid.configuration.issueState
-	readonly property string issuesUrl: {
-		var url = 'https://' + plasmoid.configuration.domain + '/rest/bug'
-		var productList = plasmoid.configuration.productList
-		for (var i = 0; i < productList.length; i++) {
-			url += i == 0 ? '?' : '&'
-			url += 'product=' + encodeURIComponent(productList[i])
-		}
-		url += '&limit=25&order=bug_id%20DESC'
-		if (issueState == 'open') {
-			url += '&bug_status=UNCONFIRMED&bug_status=CONFIRMED&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDSINFO&bug_status=VERIFIED'
-		} else if (issueState == 'closed') {
-			url += '&bug_status=CLOSED&bug_status=RESOLVED'
-		}
-		return url
-	}
 
 	property var issuesModel: []
 
@@ -44,15 +29,91 @@ Item {
 
 	Plasmoid.fullRepresentation: FullRepresentation {}
 
+	function phabApiCall(apiMethod, data, callback) {
+		var url = 'https://' + plasmoid.configuration.domain + '/api/' + apiMethod
+		logger.debug('url', url)
+
+		var args = {}
+		args.url = url
+		args.method = 'POST'
+		args.headers = {}
+		args.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+		args.data = data || {}
+		args.data['api.token'] = plasmoid.configuration.apiToken
+		Requests.encodeFormData(args)
+		logger.debug('args.data', args.data)
+
+		Requests.getJSON(args, callback)
+	}
+
+	function fetchRecentDiffs(callback) {
+		var apiMethod = 'differential.revision.search'
+		var reqData = {}
+		phabApiCall(apiMethod, reqData, function(err, data, xhr){
+			logger.debug(err)
+			logger.debugJSON(data)
+			if (err) {
+				return callback(err)
+			}
+
+			if (data.error_code) {
+				logger.debug('error_code', data.error_code, 'error_info', data.error_info)
+				return callback(data.error_info)
+			} else {
+				return callback(null, data)
+			}
+		})
+	}
+
+	function fetchDiffListRepos(diffList, callback) {
+		for (var i = 0; i < diffList.length; i++) {
+			var diff = diffList
+		}
+		var apiMethod = 'diffusion.repository.search'
+		var reqData = {}
+		phabApiCall(apiMethod, reqData, function(err, data, xhr){
+			logger.debug(err)
+			logger.debugJSON(data)
+			if (err) {
+				return callback(err)
+			}
+
+			if (data.error_code) {
+				logger.debug('error_code', data.error_code, 'error_info', data.error_info)
+				return callback(data.error_info)
+			} else {
+				return callback(null, data)
+			}
+		})
+	}
+
+	function fetchDiffListUsers(diffList, callback) {
+		var apiMethod = 'diffusion.repository.search'
+		var reqData = {}
+		phabApiCall(apiMethod, reqData, function(err, data, xhr){
+			logger.debug(err)
+			logger.debugJSON(data)
+			if (err) {
+				return callback(err)
+			}
+
+			if (data.error_code) {
+				logger.debug('error_code', data.error_code, 'error_info', data.error_info)
+				return callback(data.error_info)
+			} else {
+				return callback(null, data)
+			}
+		})
+	}
+
 	function updateIssuesModel() {
-		if (widget.hasProduct) {
-			logger.debug('issuesUrl', issuesUrl)
-			Requests.getJSON({
-				url: issuesUrl
-			}, function(err, data, xhr){
-				logger.debug(err)
-				logger.debugJSON(data)
-				widget.issuesModel = data.bugs
+		if (widget.configIsSet) {
+			fetchRecentDiffs(function(err, data) {
+				var diffList = data.result.data
+				// fetchReposForDiffs(diffList, function(err, data) {
+
+				// })
+				widget.issuesModel = diffList
 			})
 		} else {
 			widget.issuesModel = []

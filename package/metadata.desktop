@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Bugzilla
-Comment=Lists the most recent issues for a Bugzilla website.
+Name=Phabricator Revisions
+Comment=Lists the most recent diffs for a Phabricator website.
 
 Type=Service
 Icon=bug.svg
@@ -11,7 +11,7 @@ X-Plasma-MainScript=ui/Main.qml
 
 X-KDE-PluginInfo-Author=Chris Holland
 X-KDE-PluginInfo-Email=zrenfire@gmail.com
-X-KDE-PluginInfo-Name=com.github.zren.bugzilla
-X-KDE-PluginInfo-Version=2
-X-KDE-PluginInfo-Website=https://github.com/Zren/plasma-applet-bugzilla
+X-KDE-PluginInfo-Name=com.github.zren.phabricatorrevisions
+X-KDE-PluginInfo-Version=1
+X-KDE-PluginInfo-Website=https://github.com/Zren/plasma-applet-phabricatorrevisions
 X-KDE-PluginInfo-Category=Online Services
