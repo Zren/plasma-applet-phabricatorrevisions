@@ -41,7 +41,13 @@ function encodeFormData(opt) {
 			if (i > 0) {
 				s += '&'
 			}
-			s += encodeURIComponent(key) + '=' + encodeURIComponent(opt.data[key])
+			var value = opt.data[key]
+			if (typeof value === "object") {
+				// TODO: Flatten obj={list: [1, 2]} as
+				// obj[list][0]=1
+				// obj[list][1]=2
+			}
+			s += encodeURIComponent(key) + '=' + encodeURIComponent(value)
 			i += 1
 		}
 		opt.data = s
