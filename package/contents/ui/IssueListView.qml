@@ -1,4 +1,4 @@
-// Version 2
+// Version 4
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -39,9 +39,11 @@ Item {
 			visible: issueListView.showHeading
 			text: issueListView.headingText
 			font.weight: Font.Bold
-			font.pixelSize: 24
+			font.pointSize: -1
+			font.pixelSize: 18 * units.devicePixelRatio
 			elide: Text.ElideRight
 			wrapMode: Text.NoWrap
+			fontSizeMode: Text.Fit
 
 			PlasmaCore.ToolTipArea {
 				anchors.fill: parent
