@@ -1,4 +1,5 @@
 .pragma library
+// Version 3
 
 function request(opt, callback) {
 	if (typeof opt === 'string') {
@@ -30,21 +31,30 @@ function request(opt, callback) {
 	req.send(opt.data)
 }
 
+function encodeFormData(opt) {
+	opt.headers = opt.headers || {}
+	opt.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+	if (opt.data) {
+		var s = ''
+		var i = 0
+		for (var key in opt.data) {
+			if (i > 0) {
+				s += '&'
+			}
+			s += encodeURIComponent(key) + '=' + encodeURIComponent(opt.data[key])
+			i += 1
+		}
+		opt.data = s
+	}
+	return opt
+}
 
 function post(opt, callback) {
 	if (typeof opt === 'string') {
 		opt = { url: opt }
 	}
 	opt.method = 'POST'
-	opt.headers = opt.headers || {}
-	opt.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-	if (opt.data) {
-		var s = '';
-		for (var key in opt.data) {
-			s += encodeURIComponent(key) + '=' + encodeURIComponent(opt.data[key]) + '&'
-		}
-		opt.data = s
-	}
+	encodeFormData(opt)
 	request(opt, callback)
 }
 
