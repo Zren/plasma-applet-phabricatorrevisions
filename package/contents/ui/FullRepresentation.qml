@@ -18,6 +18,7 @@ IssueListView {
 		property bool issueClosed: issue.fields.status.closed
 		issueOpen: !issueClosed
 		issueId: issue.id
+		issueIdStr: 'D' + issueId
 		issueSummary: issue.fields.title
 		tagBefore: plasmoid.configuration.productList.length >= 2 ? issue.product : ""
 		issueCreatorName: issue.creator_detail.real_name || issue.creator_detail.name
