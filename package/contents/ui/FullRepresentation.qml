@@ -28,13 +28,13 @@ IssueListView {
 
 		dateTime: {
 			if (issueOpen) {
-				return issue.fields.dateCreated
+				return issue.fields.dateCreated * 1000
 			} else { // Closed
 				// Phab doesn't have a dedicated dataClosed property.
 				// This should suffice I guess, but we probably need
 				// to parse every diff's "events" to get the proper
 				// closed timestamp.
-				return issue.fields.dateModified
+				return issue.fields.dateModified * 1000
 			}
 		}
 
