@@ -44,10 +44,15 @@ IssueListView {
 		}
 
 		issueState: {
+			var statusValue = issue.fields.status.value
 			if (issueOpen) {
-				return 'opened'
+				return 'openPullRequest'
 			} else { // Closed
-				return 'closed'
+				if (statusValue == "published") {
+					return 'merged'
+				} else { // Eg: 'abandoned'
+					return 'closedPullRequest'
+				}
 			}
 		}
 	}
