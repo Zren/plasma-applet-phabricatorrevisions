@@ -1,4 +1,4 @@
-// Version 3
+// Version 4
 
 import QtQuick 2.9
 import QtQuick.Controls 1.0
@@ -36,6 +36,7 @@ ColumnLayout {
 	property alias tagBefore: issueTagBefore.text
 	property alias tagBeforeTextColor: issueTagBefore.textColor
 	property alias tagBeforeBackgroundColor: issueTagBefore.backgroundColor
+	property alias category: categoryText.text
 
 	Rectangle {
 		visible: (heading.visible && index == 0) || index > 0
@@ -122,6 +123,20 @@ ColumnLayout {
 					id: issueTagBefore
 					onVisibleChanged: issueTitleLabel.forceLayout()
 				}
+			}
+
+			TextLabel {
+				id: categoryText
+				Layout.fillWidth: true
+				wrapMode: Text.Wrap
+				font.family: 'Helvetica'
+				font.pointSize: -1
+				font.pixelSize: 12 * units.devicePixelRatio
+				opacity: 0.6
+				// font.weight: Font.Bold
+
+				text: ""
+				visible: text
 			}
 
 			TextLabel {
