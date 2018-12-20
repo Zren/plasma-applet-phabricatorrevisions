@@ -15,13 +15,17 @@ IssueListView {
 	headingText: ''
 
 	delegate: IssueListItem {
+		readonly property var author: widget.userMap[issue.fields.authorPHID]
+		readonly property var repo: widget.repoMap[issue.fields.repositoryPHID]
+
 		property bool issueClosed: issue.fields.status.closed
 		issueOpen: !issueClosed
 		issueId: issue.id
 		issueIdStr: 'D' + issueId
 		issueSummary: issue.fields.title
-		tagBefore: plasmoid.configuration.productList.length >= 2 ? issue.product : ""
-		issueCreatorName: issue.creator_detail.real_name || issue.creator_detail.name
+		tagBefore: ""
+		category: repo ? '' + repo.fields.shortName : ''
+		issueCreatorName: author ? author.fields.username : "Submitter"
 		issueHtmlLink: 'https://' + plasmoid.configuration.domain + '/D' + issue.id
 
 		showNumComments: false

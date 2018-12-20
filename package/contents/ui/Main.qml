@@ -24,6 +24,8 @@ Item {
 	readonly property string issueState: plasmoid.configuration.issueState
 
 	property var issuesModel: []
+	property var repoMap: ({})
+	property var userMap: ({})
 
 	Octicons { id: octicons }
 
@@ -65,12 +67,22 @@ Item {
 		})
 	}
 
-	function fetchDiffListRepos(diffList, callback) {
-		for (var i = 0; i < diffList.length; i++) {
-			var diff = diffList
+	function applyPhidsContraint(reqData, phidList) {
+		// Workaround our incomplete 'form-urlencoded' serialization in Requests.js
+		for (var i = 0; i < phidList.length; i++) {
+			var phid = phidList[i]
+			var key = 'constraints[phids][' + i + ']'
+			reqData[key] = phid
 		}
+	}
+
+	function fetchRepos(repoPhidList, callback) {
+		logger.debug('repoPhidList', repoPhidList)
+
 		var apiMethod = 'diffusion.repository.search'
 		var reqData = {}
+		applyPhidsContraint(reqData, repoPhidList)
+
 		phabApiCall(apiMethod, reqData, function(err, data, xhr){
 			logger.debug(err)
 			logger.debugJSON(data)
@@ -87,9 +99,13 @@ Item {
 		})
 	}
 
-	function fetchDiffListUsers(diffList, callback) {
-		var apiMethod = 'diffusion.repository.search'
+	function fetchUsers(userPhidList, callback) {
+		logger.debug('userPhidList', userPhidList)
+
+		var apiMethod = 'user.search'
 		var reqData = {}
+		applyPhidsContraint(reqData, userPhidList)
+
 		phabApiCall(apiMethod, reqData, function(err, data, xhr){
 			logger.debug(err)
 			logger.debugJSON(data)
@@ -103,6 +119,62 @@ Item {
 			} else {
 				return callback(null, data)
 			}
+		})
+	}
+
+	function fetchDiffListRepos(diffList, callback) {
+		var repoPhidList = []
+		for (var i = 0; i < diffList.length; i++) {
+			var diff = diffList[i]
+			var repoPhid = diff.fields.repositoryPHID
+			if (repoMap[repoPhid]) {
+				// skip
+			} else {
+				repoPhidList.push(repoPhid)
+			}
+		}
+
+		fetchRepos(repoPhidList, function(err, data){
+			if (err) {
+				return callback(err)
+			}
+
+			var repoList = data.result.data
+
+			for (var i = 0; i < repoList.length; i++) {
+				var repo = repoList[i]
+				repoMap[repo.phid] = repo
+			}
+
+			return callback(null, repoList)
+		})
+	}
+
+	function fetchDiffListUsers(diffList, callback) {
+		var userPhidList = []
+		for (var i = 0; i < diffList.length; i++) {
+			var diff = diffList[i]
+			var userPhid = diff.fields.authorPHID
+			if (userMap[userPhid]) {
+				// skip
+			} else {
+				userPhidList.push(userPhid)
+			}
+		}
+
+		fetchUsers(userPhidList, function(err, data){
+			if (err) {
+				return callback(err)
+			}
+
+			var userList = data.result.data
+
+			for (var i = 0; i < userList.length; i++) {
+				var user = userList[i]
+				userMap[user.phid] = user
+			}
+
+			return callback(null, userList)
 		})
 	}
 
@@ -110,10 +182,11 @@ Item {
 		if (widget.configIsSet) {
 			fetchRecentDiffs(function(err, data) {
 				var diffList = data.result.data
-				// fetchReposForDiffs(diffList, function(err, data) {
-
-				// })
-				widget.issuesModel = diffList
+				fetchDiffListRepos(diffList, function(err, data) {
+					fetchDiffListUsers(diffList, function(err, data) {
+						widget.issuesModel = diffList
+					})
+				})
 			})
 		} else {
 			widget.issuesModel = []
