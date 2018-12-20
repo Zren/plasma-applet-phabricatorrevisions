@@ -12,7 +12,7 @@ Item {
 
 	Logger {
 		id: logger
-		name: 'PhabDiffs'
+		name: 'PhabRevisions'
 		showDebug: true
 	}
 
