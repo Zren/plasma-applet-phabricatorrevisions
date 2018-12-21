@@ -6,6 +6,7 @@ import org.kde.kirigami 2.5 as Kirigami
 import "../lib"
 
 ColumnLayout {
+	property alias cfg_apiToken: apiTokenTextField.text
 	property alias cfg_domain: domainTextField.text
 	property alias cfg_updateIntervalInMinutes: updateIntervalInMinutesSpinBox.value
 
@@ -16,28 +17,49 @@ ColumnLayout {
 			Layout.fillWidth: true
 			wideMode: true
 
+			LinkText {
+				text: i18n("Visit your <a href=\"https://phabricator.kde.org/settings/\">Phabricator Settings</a>. Under the Conduit API Tokens section, generate a new token and paste it here.")
+				wrapMode: Text.Wrap
+				Layout.fillWidth: true
+			}
+
+			TextField {
+				id: apiTokenTextField
+				Kirigami.FormData.label: i18n("API Token:")
+				Layout.fillWidth: true
+			}
+
 			TextField {
 				id: domainTextField
 				Kirigami.FormData.label: i18n("Domain:")
 				Layout.fillWidth: true
 			}
 
-			ConfigStringList {
-				id: productTextField
-				Kirigami.FormData.label: i18n("Project:")
-				configKey: 'productList'
-				Layout.fillWidth: true
-			}
 
-			ConfigRadioButtonGroup {
-				Kirigami.FormData.label: i18n("Issues:")
-				configKey: "issueState"
-				model: [
-					{ value: "open", text: i18n("Open Issues") },
-					{ value: "closed", text: i18n("Closed Issues") },
-					{ value: "all", text: i18n("Open + Closed Issues") },
-				]
-			}
+			// ConfigRadioButtonGroup {
+			// 	configKey: "repoListFilterType"
+			// 	model: [
+			// 		{ value: "whitelist", text: i18n("Whitelist") },
+			// 		{ value: "blacklist", text: i18n("Blacklist") },
+			// 	]
+			// }
+
+			// ConfigStringList {
+			// 	id: repoListTextField
+			// 	Kirigami.FormData.label: i18n("Repos:")
+			// 	configKey: 'repoList'
+			// 	Layout.fillWidth: true
+			// }
+
+			// ConfigRadioButtonGroup {
+			// 	Kirigami.FormData.label: i18n("Issues:")
+			// 	configKey: "issueState"
+			// 	model: [
+			// 		{ value: "open", text: i18n("Open Issues") },
+			// 		{ value: "closed", text: i18n("Closed Issues") },
+			// 		{ value: "all", text: i18n("Open + Closed Issues") },
+			// 	]
+			// }
 
 			SpinBox {
 				id: updateIntervalInMinutesSpinBox
@@ -48,10 +70,10 @@ ColumnLayout {
 				suffix: i18nc("Polling interval in minutes", "min")
 			}
 
-			ConfigCheckBox {
-				configKey: "showHeading"
-				text: i18n("Show Heading")
-			}
+			// ConfigCheckBox {
+			// 	configKey: "showHeading"
+			// 	text: i18n("Show Heading")
+			// }
 
 			ConfigCheckBox {
 				configKey: "showBackground"
