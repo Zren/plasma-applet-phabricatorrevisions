@@ -134,6 +134,10 @@ Item {
 			}
 		}
 
+		if (repoPhidList.length == 0) {
+			return callback(null)
+		}
+
 		fetchRepos(repoPhidList, function(err, data){
 			if (err) {
 				return callback(err)
@@ -146,7 +150,7 @@ Item {
 				repoMap[repo.phid] = repo
 			}
 
-			return callback(null, repoList)
+			return callback(null)
 		})
 	}
 
@@ -162,6 +166,10 @@ Item {
 			}
 		}
 
+		if (userPhidList.length == 0) {
+			return callback(null)
+		}
+
 		fetchUsers(userPhidList, function(err, data){
 			if (err) {
 				return callback(err)
@@ -174,7 +182,7 @@ Item {
 				userMap[user.phid] = user
 			}
 
-			return callback(null, userList)
+			return callback(null)
 		})
 	}
 
@@ -182,8 +190,8 @@ Item {
 		if (widget.configIsSet) {
 			fetchRecentDiffs(function(err, data) {
 				var diffList = data.result.data
-				fetchDiffListRepos(diffList, function(err, data) {
-					fetchDiffListUsers(diffList, function(err, data) {
+				fetchDiffListRepos(diffList, function(err) {
+					fetchDiffListUsers(diffList, function(err) {
 						widget.issuesModel = diffList
 					})
 				})
