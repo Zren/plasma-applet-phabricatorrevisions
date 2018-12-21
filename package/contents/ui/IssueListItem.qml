@@ -1,4 +1,4 @@
-// Version 4
+// Version 5
 
 import QtQuick 2.9
 import QtQuick.Controls 1.0
@@ -30,9 +30,6 @@ ColumnLayout {
 	property string issueState: 'opened'
 
 	property alias dateTime: timestampText.dateTime
-	property alias tagAbove: issueTagAbove.text
-	property alias tagAboveTextColor: issueTagAbove.textColor
-	property alias tagAboveBackgroundColor: issueTagAbove.backgroundColor
 	property alias tagBefore: issueTagBefore.text
 	property alias tagBeforeTextColor: issueTagBefore.textColor
 	property alias tagBeforeBackgroundColor: issueTagBefore.backgroundColor
@@ -98,10 +95,6 @@ ColumnLayout {
 		ColumnLayout {
 			spacing: 4 * units.devicePixelRatio
 
-			IssueTag {
-				id: issueTagAbove
-			}
-
 			TextButton {
 				id: issueTitleLabel
 
@@ -133,7 +126,7 @@ ColumnLayout {
 				font.pointSize: -1
 				font.pixelSize: 12 * units.devicePixelRatio
 				opacity: 0.6
-				// font.weight: Font.Bold
+				font.weight: Font.Bold
 
 				text: ""
 				visible: text
