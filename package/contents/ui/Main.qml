@@ -13,7 +13,7 @@ Item {
 	Logger {
 		id: logger
 		name: 'PhabRevisions'
-		showDebug: true
+		// showDebug: true
 	}
 
 	Plasmoid.icon: plasmoid.file("", "icons/bug.svg")
