@@ -16,7 +16,7 @@ Item {
 		// showDebug: true
 	}
 
-	Plasmoid.icon: plasmoid.file("", "icons/bug.svg")
+	Plasmoid.icon: plasmoid.file("", "icons/phabricator-logo.svg")
 	Plasmoid.backgroundHints: plasmoid.configuration.showBackground ? PlasmaCore.Types.DefaultBackground : PlasmaCore.Types.NoBackground
 	Plasmoid.hideOnWindowDeactivate: !plasmoid.userConfiguring
 
