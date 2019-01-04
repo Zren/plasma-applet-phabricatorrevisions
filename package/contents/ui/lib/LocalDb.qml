@@ -1,4 +1,4 @@
-// Version 1
+// Version 2
 
 import QtQuick 2.0
 import QtQuick.LocalStorage 2.0
@@ -134,6 +134,36 @@ QtObject {
 			var rs = tx.executeSql('DELETE FROM KeyValue')
 			logger.debug('db.deleteAll.done')
 			callback(null)
+		})
+	}
+
+	function hasExpired(dt, ttl) {
+		var now = new Date()
+		var diff = now.getTime() - dt.getTime()
+		return diff >= ttl
+	}
+
+	function getOrFetchJSON(key, ttl, populate, callback) {
+		localDb.getJSON(key, function(err, data, row){
+			var shouldUpdate = true
+			if (data) {
+				// Can we assume the timestamp is always UTC?
+				// The 'Z' parses the timestamp in UTC.
+				// Maybe check the length of the string?
+				var rowUpdatedAt = new Date(row.updated_at + 'Z')
+				shouldUpdate = hasExpired(rowUpdatedAt, ttl)
+			}
+			logger.debug('db.getOrFetchJSON', key, '(shouldUpdate=', shouldUpdate, ')')
+
+			if (shouldUpdate) {
+				populate(function(err, data) {
+					localDb.setJSON(key, data, function(err){
+						callback(err, data)
+					})
+				})
+			} else {
+				callback(err, data)
+			}
 		})
 	}
 }
