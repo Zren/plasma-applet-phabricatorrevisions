@@ -29,6 +29,13 @@ Item {
 
 	Octicons { id: octicons }
 
+	LocalDb {
+		id: localDb
+		name: plasmoid.pluginName
+		version: "1" // DB version, not Widget version
+		showDebug: logger.showDebug
+	}
+
 	Plasmoid.fullRepresentation: FullRepresentation {}
 
 	function phabApiCall(apiMethod, data, callback) {
@@ -64,6 +71,25 @@ Item {
 			} else {
 				return callback(null, data)
 			}
+		})
+	}
+
+	function getRecentDiffs(callback) {
+		var recentDiffsKey = 'differential.revision.search'
+		var ttl = widget.updateIntervalInMillis
+		localDb.getOrFetchJSON(recentDiffsKey, ttl, function(populateCallback){
+			fetchRecentDiffs(populateCallback)
+		}, callback)
+	}
+
+
+	function deleteCache(callback) {
+		localDb.deleteAll(callback)
+	}
+
+	function deleteCacheAndReload() {
+		deleteCache(function() {
+			debouncedUpdateIssuesModel.restart()
 		})
 	}
 
@@ -188,7 +214,7 @@ Item {
 
 	function updateIssuesModel() {
 		if (widget.configIsSet) {
-			fetchRecentDiffs(function(err, data) {
+			getRecentDiffs(function(err, data) {
 				var diffList = data.result.data
 				fetchDiffListRepos(diffList, function(err) {
 					fetchDiffListUsers(diffList, function(err) {
@@ -221,9 +247,9 @@ Item {
 
 	Connections {
 		target: plasmoid.configuration
-		onDomainChanged: debouncedUpdateIssuesModel.restart()
-		onProductChanged: debouncedUpdateIssuesModel.restart()
-		onIssueStateChanged: debouncedUpdateIssuesModel.restart()
+		onDomainChanged: deleteCacheAndReload()
+		onProductChanged: deleteCacheAndReload()
+		onIssueStateChanged: deleteCacheAndReload()
 	}
 
 	function action_refresh() {
@@ -233,7 +259,9 @@ Item {
 	Component.onCompleted: {
 		plasmoid.setAction("refresh", i18n("Refresh"), "view-refresh")
 
-		updateIssuesModel()
+		localDb.initDb(function(err){
+			updateIssuesModel()
+		})
 
 		// plasmoid.action("configure").trigger() // Uncomment to test config window
 	}
