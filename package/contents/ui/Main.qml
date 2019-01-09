@@ -20,6 +20,7 @@ Item {
 	Plasmoid.backgroundHints: plasmoid.configuration.showBackground ? PlasmaCore.Types.DefaultBackground : PlasmaCore.Types.NoBackground
 	Plasmoid.hideOnWindowDeactivate: !plasmoid.userConfiguring
 
+	readonly property int updateIntervalInMillis: plasmoid.configuration.updateIntervalInMinutes * 60 * 1000
 	readonly property bool configIsSet: plasmoid.configuration.apiToken && plasmoid.configuration.domain
 	readonly property string issueState: plasmoid.configuration.issueState
 
