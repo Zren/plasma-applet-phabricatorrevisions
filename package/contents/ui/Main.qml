@@ -34,6 +34,14 @@ Item {
 		name: plasmoid.pluginName
 		version: "1" // DB version, not Widget version
 		showDebug: logger.showDebug
+
+		property var userName: initTable('UserName')
+		property var repoName: initTable('RepoName')
+
+		onSetupTables: {
+			userName.createTable(tx)
+			repoName.createTable(tx)
+		}
 	}
 
 	Plasmoid.fullRepresentation: FullRepresentation {}
@@ -77,14 +85,15 @@ Item {
 	function getRecentDiffs(callback) {
 		var recentDiffsKey = 'differential.revision.search'
 		var ttl = widget.updateIntervalInMillis
-		localDb.getOrFetchJSON(recentDiffsKey, ttl, function(populateCallback){
+		localDb.keyValue.getOrFetchJSON(recentDiffsKey, ttl, function(populateCallback){
+			logger.debug('getRecentDiffs.populate')
 			fetchRecentDiffs(populateCallback)
 		}, callback)
 	}
 
 
 	function deleteCache(callback) {
-		localDb.deleteAll(callback)
+		localDb.keyValue.deleteAll(callback)
 	}
 
 	function deleteCacheAndReload() {
@@ -153,9 +162,7 @@ Item {
 		for (var i = 0; i < diffList.length; i++) {
 			var diff = diffList[i]
 			var repoPhid = diff.fields.repositoryPHID
-			if (repoMap[repoPhid]) {
-				// skip
-			} else {
+			if (repoPhid && !repoMap[repoPhid]) {
 				repoPhidList.push(repoPhid)
 			}
 		}
@@ -164,6 +171,7 @@ Item {
 			return callback(null)
 		}
 
+		logger.debug('fetchRepos.populate', repoPhidList)
 		fetchRepos(repoPhidList, function(err, data){
 			if (err) {
 				return callback(err)
@@ -173,7 +181,9 @@ Item {
 
 			for (var i = 0; i < repoList.length; i++) {
 				var repo = repoList[i]
-				repoMap[repo.phid] = repo
+				var repoName = repo.fields.shortName
+				repoMap[repo.phid] = repoName
+				localDb.repoName.setJSON(repo.phid, repoName, function(){})
 			}
 
 			return callback(null)
@@ -185,9 +195,7 @@ Item {
 		for (var i = 0; i < diffList.length; i++) {
 			var diff = diffList[i]
 			var userPhid = diff.fields.authorPHID
-			if (userMap[userPhid]) {
-				// skip
-			} else {
+			if (userPhid && !userMap[userPhid]) {
 				userPhidList.push(userPhid)
 			}
 		}
@@ -196,6 +204,7 @@ Item {
 			return callback(null)
 		}
 
+		logger.debug('fetchUsers.populate', userPhidList)
 		fetchUsers(userPhidList, function(err, data){
 			if (err) {
 				return callback(err)
@@ -205,7 +214,9 @@ Item {
 
 			for (var i = 0; i < userList.length; i++) {
 				var user = userList[i]
-				userMap[user.phid] = user
+				var userName = user.fields.username
+				userMap[user.phid] = userName
+				localDb.userName.setJSON(user.phid, userName, function(){})
 			}
 
 			return callback(null)
@@ -260,7 +271,15 @@ Item {
 		plasmoid.setAction("refresh", i18n("Refresh"), "view-refresh")
 
 		localDb.initDb(function(err){
-			updateIssuesModel()
+			localDb.userName.getAllAsMap(function(err, map){
+				// console.log('userName', Object.values(map))
+				userMap = map
+				localDb.repoName.getAllAsMap(function(err, map){
+					// console.log('repoName', Object.values(map))
+					repoMap = map
+					updateIssuesModel()
+				})
+			})
 		})
 
 		// plasmoid.action("configure").trigger() // Uncomment to test config window

@@ -15,8 +15,8 @@ IssueListView {
 	headingText: ''
 
 	delegate: IssueListItem {
-		readonly property var author: widget.userMap[issue.fields.authorPHID]
-		readonly property var repo: widget.repoMap[issue.fields.repositoryPHID]
+		readonly property var authorName: widget.userMap[issue.fields.authorPHID]
+		readonly property var repoName: widget.repoMap[issue.fields.repositoryPHID]
 
 		property bool issueClosed: issue.fields.status.closed
 		issueOpen: !issueClosed
@@ -24,8 +24,8 @@ IssueListView {
 		issueIdStr: 'D' + issueId
 		issueSummary: issue.fields.title
 		tagBefore: ""
-		category: repo ? '' + repo.fields.shortName : ''
-		issueCreatorName: author ? author.fields.username : "Submitter"
+		category: repoName || ""
+		issueCreatorName: authorName || "Submitter"
 		issueHtmlLink: 'https://' + plasmoid.configuration.domain + '/D' + issue.id
 
 		showNumComments: false
