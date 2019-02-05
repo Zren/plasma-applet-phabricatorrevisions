@@ -35,31 +35,42 @@ ColumnLayout {
 				Layout.fillWidth: true
 			}
 
+			ConfigString {
+				id: queryKeyTextField1
+				Kirigami.FormData.label: i18n("Query Key:")
+				configKey: "queryKey"
+				readonly property string domain: plasmoid.configuration.domain || "phabricator.kde.org"
+				before: "https://" + domain + "/query/"
+				placeholderText: "zm2vHZxBkky_" // plasma-workspace
+				after: "/"
+			}
 
-			// ConfigRadioButtonGroup {
-			// 	configKey: "repoListFilterType"
-			// 	model: [
-			// 		{ value: "whitelist", text: i18n("Whitelist") },
-			// 		{ value: "blacklist", text: i18n("Blacklist") },
-			// 	]
-			// }
+			ConfigRadioButtonGroup {
+				id: queryKeyButtonGroup
+				configKey: "queryKey"
+				model: [
+					{ value: "active", text: i18n("Active") },
+					{ value: "authored", text: i18n("Authored") },
+					{ value: "all", text: i18n("All") },
+				]
+			}
+			RowLayout {
+				RadioButton {
+					property string configKey: "queryKey"
+					readonly property string configValue: plasmoid.configuration[configKey]
+					text: i18n("Custom")
+					checked: configValue != "active" && configValue != "authored" && configValue != "all"
+					exclusiveGroup: queryKeyButtonGroup.exclusiveGroup
+					onClicked: {
+						plasmoid.configuration[configKey] = ""
+					}
+				}
 
-			// ConfigStringList {
-			// 	id: repoListTextField
-			// 	Kirigami.FormData.label: i18n("Repos:")
-			// 	configKey: 'repoList'
-			// 	Layout.fillWidth: true
-			// }
-
-			// ConfigRadioButtonGroup {
-			// 	Kirigami.FormData.label: i18n("Issues:")
-			// 	configKey: "issueState"
-			// 	model: [
-			// 		{ value: "open", text: i18n("Open Issues") },
-			// 		{ value: "closed", text: i18n("Closed Issues") },
-			// 		{ value: "all", text: i18n("Open + Closed Issues") },
-			// 	]
-			// }
+				ConfigString {
+					configKey: "queryKey"
+					placeholderText: queryKeyTextField1.placeholderText
+				}
+			}
 
 			SpinBox {
 				id: updateIntervalInMinutesSpinBox

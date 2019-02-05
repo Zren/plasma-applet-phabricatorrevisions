@@ -12,9 +12,6 @@
     <entry name="domain" type="string">
       <default>phabricator.kde.org</default>
     </entry>
-    <entry name="productList" type="stringlist">
-      <default></default>
-    </entry>
     <entry name="updateIntervalInMinutes" type="int">
       <default>60</default>
     </entry>
