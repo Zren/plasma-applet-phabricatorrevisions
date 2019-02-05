@@ -18,9 +18,9 @@
     <entry name="updateIntervalInMinutes" type="int">
       <default>60</default>
     </entry>
-    <entry name="issueState" type="string">
-      <!-- enum: open, closed, all -->
-      <default>open</default>
+    <entry name="queryKey" type="string">
+      <!-- zm2vHZxBkky_, ..., active, authored, all -->
+      <default></default>
     </entry>
     <entry name="showHeading" type="bool">
       <default>false</default>

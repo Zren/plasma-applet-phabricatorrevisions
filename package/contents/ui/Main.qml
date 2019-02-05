@@ -22,7 +22,7 @@ Item {
 
 	readonly property int updateIntervalInMillis: plasmoid.configuration.updateIntervalInMinutes * 60 * 1000
 	readonly property bool configIsSet: plasmoid.configuration.apiToken && plasmoid.configuration.domain
-	readonly property string issueState: plasmoid.configuration.issueState
+	readonly property string queryKey: plasmoid.configuration.queryKey
 
 	property var issuesModel: []
 	property var repoMap: ({})
@@ -58,6 +58,9 @@ Item {
 		args.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 		args.data = data || {}
 		args.data['api.token'] = plasmoid.configuration.apiToken
+		if (widget.queryKey) {
+			args.data['queryKey'] = widget.queryKey
+		}
 		Requests.encodeFormData(args)
 		logger.debug('args.data', args.data)
 
@@ -261,7 +264,7 @@ Item {
 		target: plasmoid.configuration
 		onDomainChanged: deleteCacheAndReload()
 		onProductChanged: deleteCacheAndReload()
-		onIssueStateChanged: deleteCacheAndReload()
+		onQueryKeyChanged: deleteCacheAndReload()
 	}
 
 	function action_refresh() {
