@@ -1,4 +1,4 @@
-// Version 2
+// Version 3
 
 import QtQuick 2.0
 import QtQuick.Controls 1.0
@@ -18,7 +18,7 @@ ConfigRadioButtonGroup {
 */
 ColumnLayout {
 	id: configRadioButtonGroup
-	ExclusiveGroup { id: radioButtonGroup }
+	property var exclusiveGroup: ExclusiveGroup { id: radioButtonGroup }
 
 	property string configKey: ''
 	readonly property string configValue: configKey ? plasmoid.configuration[configKey] : ""
@@ -32,6 +32,7 @@ ColumnLayout {
 			checked: modelData.value == configValue
 			exclusiveGroup: radioButtonGroup
 			onClicked: {
+				focus = true
 				plasmoid.configuration[configKey] = modelData.value
 			}
 		}
