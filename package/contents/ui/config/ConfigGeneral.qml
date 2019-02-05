@@ -10,6 +10,8 @@ ColumnLayout {
 	property alias cfg_domain: domainTextField.text
 	property alias cfg_updateIntervalInMinutes: updateIntervalInMinutesSpinBox.value
 
+	readonly property string baseDomainUrl: "https://" + (cfg_domain || "phabricator.kde.org")
+
 	ColumnLayout {
 		Layout.alignment: Qt.AlignTop
 
@@ -18,7 +20,8 @@ ColumnLayout {
 			wideMode: true
 
 			LinkText {
-				text: i18n("Visit your <a href=\"https://phabricator.kde.org/settings/\">Phabricator Settings</a>. Under the Conduit API Tokens section, generate a new token and paste it here.")
+				readonly property string settingsUrl: baseDomainUrl + "/settings/"
+				text: i18n("Visit your <a href=\"%1\">Phabricator Settings</a>. Under the Conduit API Tokens section, generate a new token and paste it here.", settingsUrl)
 				wrapMode: Text.Wrap
 				Layout.fillWidth: true
 			}
@@ -39,8 +42,7 @@ ColumnLayout {
 				id: queryKeyTextField1
 				Kirigami.FormData.label: i18n("Query Key:")
 				configKey: "queryKey"
-				readonly property string domain: plasmoid.configuration.domain || "phabricator.kde.org"
-				before: "https://" + domain + "/query/"
+				before: baseDomainUrl + "/query/"
 				placeholderText: "zm2vHZxBkky_" // plasma-workspace
 				after: "/"
 			}
