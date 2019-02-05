@@ -42,7 +42,7 @@ ColumnLayout {
 				id: queryKeyTextField1
 				Kirigami.FormData.label: i18n("Query Key:")
 				configKey: "queryKey"
-				before: baseDomainUrl + "/query/"
+				before: baseDomainUrl + "/differential/query/"
 				placeholderText: "zm2vHZxBkky_" // plasma-workspace
 				after: "/"
 			}
