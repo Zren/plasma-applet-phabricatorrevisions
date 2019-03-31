@@ -58,18 +58,18 @@ Item {
 		args.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 		args.data = data || {}
 		args.data['api.token'] = plasmoid.configuration.apiToken
-		if (widget.queryKey) {
-			args.data['queryKey'] = widget.queryKey
-		}
 		Requests.encodeFormData(args)
 		logger.debug('args.data', args.data)
 
 		Requests.getJSON(args, callback)
 	}
 
-	function fetchRecentDiffs(callback) {
+	function fetchRecentDiffs(queryKey, callback) {
 		var apiMethod = 'differential.revision.search'
 		var reqData = {}
+		if (queryKey) {
+			reqData['queryKey'] = queryKey
+		}
 		phabApiCall(apiMethod, reqData, function(err, data, xhr){
 			logger.debug(err)
 			logger.debugJSON(data)
@@ -87,11 +87,15 @@ Item {
 	}
 
 	function getRecentDiffs(callback) {
+		var queryKey = widget.queryKey
 		var recentDiffsKey = 'differential.revision.search'
+		if (queryKey) {
+			recentDiffsKey += '?queryKey=' + queryKey
+		}
 		var ttl = widget.updateIntervalInMillis
 		localDb.keyValue.getOrFetchJSON(recentDiffsKey, ttl, function(populateCallback){
 			logger.debug('getRecentDiffs.populate')
-			fetchRecentDiffs(populateCallback)
+			fetchRecentDiffs(queryKey, populateCallback)
 		}, callback)
 	}
 
